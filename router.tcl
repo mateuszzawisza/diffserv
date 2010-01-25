@@ -6,11 +6,20 @@ set Conn [open output/Conn.tr w]; # file containing the number of connections
 
 set tf   [open output/out.tr w];  # Open the Trace file
 
+set file2 [open output/out.nam w]
+
 set pktSize    1000
 set NodeNb       3;# Number of source nodes
 set NumberFlows 16 ; # Number of flows per source node 
 set throughput 6Mb
+set sduration 10
 $ns trace-all $tf    
+
+proc logMessage { message } {
+  puts "\n\n*****************************************\n"
+  puts $message
+  puts "\n*****************************************\n\n"
+}
 
 
 proc countFlows { ind sign } {
@@ -60,6 +69,7 @@ proc countFlows { ind sign } {
 
   #diff serv  
 proc setQueue {ns s d} {
+  logMessage "setting up a queue"
   set queueSD [[$ns link $s $d] queue]
   $queueSD       meanPktSize 40
   $queueSD   set numQueues_   1
@@ -106,6 +116,7 @@ proc setQueue {ns s d} {
   $fmon attach $monfile
   
   #TCP Sources, destinations, connections
+  logMessage "setting up sources"
   for {set i 1} {$i<=$NodeNb} { incr i } {
     for {set j 1} {$j<=$NumberFlows} { incr j } {
       set tcpsrc($i,$j) [new Agent/TCP/Newreno]
@@ -119,7 +130,7 @@ proc setQueue {ns s d} {
       set ftp($i,$j) [$tcpsrc($i,$j) attach-source FTP]
     }
   }
-  
+  logMessage "Generators for random size of files."
   # Generators for random size of files. 
   set rng1 [new RNG]
   $rng1 seed 22
@@ -129,7 +140,7 @@ proc setQueue {ns s d} {
   $RV set avg_ 0.2
   $RV use-rng $rng1 
   
-  # Random size of files to transmit 
+  logMessage "Random size of files to transmit"
   set RVSize [new RandomVariable/Pareto]
   $RVSize set avg_ 10000 
   $RVSize set shape_ 1.25
@@ -141,6 +152,7 @@ proc setQueue {ns s d} {
   # We now define the beginning times of transfers and the transfer sizes
   # Arrivals of sessions follow a Poisson process.
   #
+  logMessage "defining beginning times of transfers"
   for {set i 1} {$i<=$NodeNb} { incr i } {
     set t [$ns now]
   
@@ -156,12 +168,14 @@ proc setQueue {ns s d} {
     }
   }
   
+  logMessage "setting smthng"
   for {set j 1} {$j<=$NodeNb} { incr j } {
     set Cnts($j) 0
   }   
   
   # The following procedure is called whenever a connection ends
   Agent/TCP instproc done {} {
+  logMessage "connection ended!"
     global tcpsrc NodeNb NumberFlows ns RV ftp Out tcp_snk RVSize 
     # print in $Out: node, session, start time,  end time, duration,      
     # trans-pkts, transm-bytes, retrans-bytes, throughput   
@@ -185,6 +199,7 @@ proc setQueue {ns s d} {
 
 #Define a 'finish' procedure
 proc finish {} {
+  logMessage "finished"
   global ns tf file2
   $ns flush-trace
   close $file2 
@@ -192,5 +207,9 @@ proc finish {} {
 }         
 
 #setNodes $ns 6Mb
+$ns at 0.5 "countFlows 1 3"
+$ns at [expr $sduration - 0.01] "$fmon dump"
+$ns at [expr $sduration - 0.001] "$qBC printStats"
+$ns at $sduration "finish"
 
   $ns run
