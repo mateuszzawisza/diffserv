@@ -1,23 +1,44 @@
 set ns [new Simulator] 
 
-set Out [open Out.ns w];   # file containing transfer 
+set Out [open output/Out.ns w];   # file containing transfer 
                            # times of different connections
-set Conn [open Conn.tr w]; # file containing the number of connections 
+set Conn [open output/Conn.tr w]; # file containing the number of connections 
 
-set tf   [open out.tr w];  # Open the Trace file
+set tf   [open output/out.tr w];  # Open the Trace file
 
 set pktSize    1000
-set NodeNb       10; # Number of source nodes
+set NodeNb       3;# Number of source nodes
+set NumberFlows 16 ; # Number of flows per source node 
 set throughput 6Mb
 $ns trace-all $tf    
 
+
+proc countFlows { ind sign } {
+  global Cnts Conn NodeNb
+  set ns [Simulator instance]
+  if { $sign==0 } {
+    set Cnts($ind) [expr $Cnts($ind) - 1] 
+  } elseif { $sign==1 } {
+    set Cnts($ind) [expr $Cnts($ind) + 1] 
+  } else { 
+    puts -nonewline $Conn "[$ns now] \t"
+    set sum 0
+    for {set j 1} {$j<=$NodeNb} { incr j } {
+      puts -nonewline $Conn "$Cnts($j) \t"
+      set sum [expr $sum + $Cnts($j)]
+    }
+    puts $Conn "$sum"
+    puts $Conn ""
+    $ns at [expr [$ns now] + 0.2] "countFlows 1 3"
+    puts "in count"
+  }
+}
 
 #proc setNodes {ns throughput} {
   set Agw [$ns node]
   set Bgw [$ns node]
   set Core [$ns node]
-set flink [$ns simplex-link $Core $Agw 10Mb 1ms dsRED/core]
-set flink [$ns simplex-link $Core $Bgw 10Mb 1ms dsRED/core]
+  set flink [$ns simplex-link $Core $Bgw 10Mb 1ms dsRED/core]
 
   $ns simplex-link $Agw $Core $throughput 0.1ms dsRED/edge
   $ns simplex-link $Core $Agw $throughput 0.1ms dsRED/core
@@ -27,7 +48,7 @@ set flink [$ns simplex-link $Core $Bgw 10Mb 1ms dsRED/core]
   $ns simplex-link $Core $Bgw $throughput 0.1ms dsRED/core
   $ns queue-limit  $Core $Bgw  100
 
-  for {set i 1} {$i < 10} {incr i} {
+  for {set i 1} {$i <= $NodeNb} {incr i} {
     set A($i) [$ns node]
     $ns duplex-link $Agw $A($i) $throughput 0.01ms DropTail
     $ns queue-limit $A($i) $Agw 100
@@ -79,7 +100,7 @@ proc setQueue {ns s d} {
 #}
 
 
-  set monfile [open mon.tr w]
+  set monfile [open output/mon.tr w]
   set fmon [$ns makeflowmon Fid]
   $ns attach-fmon $flink $fmon
   $fmon attach $monfile
@@ -92,8 +113,8 @@ proc setQueue {ns s d} {
       set k [expr $i*1000 +$j];
       $tcpsrc($i,$j) set fid_ $k
       $tcpsrc($i,$j) set window_ 2000
-      $ns attach-agent $S($i) $tcpsrc($i,$j)
-      $ns attach-agent $D $tcp_snk($i,$j)
+      $ns attach-agent $A($i) $tcpsrc($i,$j)
+      $ns attach-agent $Agw $tcp_snk($i,$j)
       $ns connect $tcpsrc($i,$j) $tcp_snk($i,$j)
       set ftp($i,$j) [$tcpsrc($i,$j) attach-source FTP]
     }
@@ -158,31 +179,9 @@ proc setQueue {ns s d} {
         countFlows [$self set node] 0
   
   }
-}
+#}
 
 
-proc countflows { ind sign } {
-  global Cnts Conn NodeNb
-  set ns [Simulator instance]
-  if { $sign==0 } {
-    set Cnts($ind) [expr $Cnts($ind) - 1] 
-  } 
-  elseif { $sign==1 } {
-    set Cnts($ind) [expr $Cnts($ind) + 1] 
-  }
-  else { 
-    puts -nonewline $Conn "[$ns now] \t"
-    set sum 0
-    for {set j 1} {$j<=$NodeNb} { incr j } {
-      puts -nonewline $Conn "$Cnts($j) \t"
-      set sum [expr $sum + $Cnts($j)]
-    }
-    puts $Conn "$sum"
-    puts $Conn ""
-    $ns at [expr [$ns now] + 0.2] "countFlows 1 3"
-    puts "in count"
-  }
-}
 
 #Define a 'finish' procedure
 proc finish {} {
