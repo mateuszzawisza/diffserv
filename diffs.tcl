@@ -217,11 +217,9 @@ proc countFlows { ind sign } {
   set ns [Simulator instance]
   if { $sign==0 } {
     set Cnts($ind) [expr $Cnts($ind) - 1] 
-  } 
-  elseif { $sign==1 } {
+  } elseif { $sign==1 } {
     set Cnts($ind) [expr $Cnts($ind) + 1] 
-  }
-  else { 
+  } else { 
     puts -nonewline $Conn "[$ns now] \t"
     set sum 0
     for {set j 1} {$j<=$NodeNb} { incr j } {
