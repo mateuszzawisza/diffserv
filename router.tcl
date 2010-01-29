@@ -1,3 +1,4 @@
+global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk RandomFileSize 
 # The following procedure is called whenever a connection ends
 Agent/TCP instproc done {} {
 global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk RandomFileSize 
@@ -45,14 +46,30 @@ proc logMessage { message } {
   puts "\n*****************************************\n\n"
 }
 
-proc setQueue {ns s d} {
+proc setQueue {ns s d a b nodeCount} {
   logMessage "setting up a queue"
   set queueSD [[$ns link $s $d] queue]
-  $queueSD       meanPktSize 40
-  $queueSD   set numQueues_   1
-  $queueSD    setNumPrec      2
+  $queueSD meanPktSize 40
+  $queueSD set numQueues_ 1
+  $queueSD setNumPrec 2
 
-  $queueSD addPolicyEntry [$s id] [$d id] TSW2CM 10 3000 0.02
+#  $queueSD addPolicyEntry [$s id] [$d id] TSW2CM 10 3000 0.02
+
+
+  set cir 3000
+
+  upvar $a A
+  upvar $b B
+
+  for {set i 1} {$i<=$nodeCount} { incr i } {
+    for {set j 1} {$j<=$nodeCount} { incr j } {
+puts "A($i) = [$A($i) id]    AND     B($j) = [$B($j) id]"
+      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW2CM 10 $cir 0.02
+      $queueSD addPolicyEntry [$B($i) id] [$A($j) id] TSW2CM 10 $cir 0.02
+    }
+  }
+
+
   $queueSD addPolicerEntry TSW2CM 10 11
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
@@ -99,7 +116,7 @@ set LinkLogFile [open output/link_AC_log.tr w]
 
 set pktSize      1000; # packet size
 set NodeCount    3;    # Number of source nodes
-set FlowsCount  16;   # Number of flows per source node 
+set FlowsCount   16;   # Number of flows per source node 
 set throughput   6Mb;  # router's thorughput
 set sduration    100;  # symulation duration
 
@@ -112,9 +129,6 @@ set sduration    100;  # symulation duration
 set Agw [$ns node]
 set Bgw [$ns node]
 set Core [$ns node]
-#set flink [$ns simplex-link $Agw $Bgw 10Mb 1ms DropTail]
-#set glink [$ns simplex-link $Bgw $Agw 10Mb 1ms DropTail]
-
 
 ###############################  MAIN LINKS  ###############################
 
@@ -134,16 +148,6 @@ $ns queue-limit  $Core $Bgw  100
 # $linnkFlowMonitor attach $LinkLogFile
 
 
-###############################  QUEUES  ###############################
-
-# set q1 [setQueue $ns $Bgw $Core]
-# set qBC [lindex $q1 0]
-# set qCB [lindex $q1 1]
-
-set q2 [setQueue $ns $Agw $Core]
-set qAC [lindex $q2 0]
-set qCA [lindex $q2 1]
-
 ###############################  END NODES AND LINKS  ###############################
 
 for {set i 1} {$i <= $NodeCount} {incr i} {
@@ -157,11 +161,21 @@ for {set i 1} {$i <= $NodeCount} {incr i} {
 }
 
 
+###############################  QUEUES  ###############################
+
+# set q1 [setQueue $ns $Bgw $Core]
+# set qBC [lindex $q1 0]
+# set qCB [lindex $q1 1]
+
+set q2 [setQueue $ns $Agw $Core A B $NodeCount]
+set qAC [lindex $q2 0]
+set qCA [lindex $q2 1]
+
 ###############################  SOURCES  ###############################
 
 logMessage "setting up sources"
-for {set i 1} {$i<=$NodeCount} { incr i } {
-  for {set j 1} {$j<=$FlowsCount} { incr j } {
+for {set i 1} {$i <= $NodeCount} { incr i } {
+  for {set j 1} {$j <= $FlowsCount} { incr j } {
     set tcpsrc($i,$j) [new Agent/TCP/Newreno]
     set tcp_snk($i,$j) [new Agent/TCPSink]
     set k [expr $i*1000 +$j];
@@ -170,7 +184,7 @@ for {set i 1} {$i<=$NodeCount} { incr i } {
     $ns attach-agent $A($i) $tcpsrc($i,$j)
 #TODO: wrzucić jako funkcje
 #    $ns attach-agent $B(1) $tcp_snk($i,$j)
-    $ns attach-agent $Agw $tcp_snk($i,$j)
+    $ns attach-agent $B(1) $tcp_snk($i,$j)
     $ns connect $tcpsrc($i,$j) $tcp_snk($i,$j)
     set ftp($i,$j) [$tcpsrc($i,$j) attach-source FTP]
   }
