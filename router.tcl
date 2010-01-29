@@ -52,24 +52,7 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD meanPktSize 40
   $queueSD set numQueues_ 1
   $queueSD setNumPrec 2
-
 #  $queueSD addPolicyEntry [$s id] [$d id] TSW2CM 10 3000 0.02
-
-
-  set cir 3000
-
-  upvar $a A
-  upvar $b B
-
-  for {set i 1} {$i<=$nodeCount} { incr i } {
-    for {set j 1} {$j<=$nodeCount} { incr j } {
-puts "A($i) = [$A($i) id]    AND     B($j) = [$B($j) id]"
-      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW2CM 10 $cir 0.02
-      $queueSD addPolicyEntry [$B($i) id] [$A($j) id] TSW2CM 10 $cir 0.02
-    }
-  }
-
-
   $queueSD addPolicerEntry TSW2CM 10 11
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
@@ -83,11 +66,25 @@ puts "A($i) = [$A($i) id]    AND     B($j) = [$B($j) id]"
   $queueDS meanPktSize      40
   $queueDS set numQueues_   1
   $queueDS setNumPrec      2
+  $queueDS addPolicerEntry TSW2CM 10 11
   $queueDS addPHBEntry  10 0 0 
   $queueDS addPHBEntry  11 0 1 
   $queueDS configQ 0 0 10 20 0.1
   $queueDS configQ 0 1 10 20 0.1
 
+  set cir 3000
+
+  upvar $a A
+  upvar $b B
+
+  for {set i 1} {$i<=$nodeCount} { incr i } {
+    for {set j 1} {$j<=$nodeCount} { incr j } {
+      puts "A($i) = [$A($i) id]    AND     B($j) = [$B($j) id]"
+      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW2CM 10 $cir 0.02
+      puts "A($i) = [$B($i) id]    AND     B($j) = [$A($j) id]"
+      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW2CM 10 $cir 0.02
+    }
+  }
 
   return [list $queueSD $queueDS]
 }
@@ -115,8 +112,8 @@ set file2 [open output/out.nam w]
 set LinkLogFile [open output/link_AC_log.tr w]
 
 set pktSize      1000; # packet size
-set NodeCount    3;    # Number of source nodes
-set FlowsCount   16;   # Number of flows per source node 
+set NodeCount    3;   # Number of source nodes
+set FlowsCount   6;   # Number of flows per source node 
 set throughput   6Mb;  # router's thorughput
 set sduration    100;  # symulation duration
 
@@ -143,7 +140,7 @@ $ns queue-limit  $Core $Bgw  100
 
 ###############################  FLOW MONITOR  ###############################
 
-#set linnkFlowMonitor [$ns makeflowmon Fid]
+# set linnkFlowMonitor [$ns makeflowmon Fid]
 # $ns attach-fmon $linkAC $linnkFlowMonitor
 # $linnkFlowMonitor attach $LinkLogFile
 
@@ -182,9 +179,7 @@ for {set i 1} {$i <= $NodeCount} { incr i } {
     $tcpsrc($i,$j) set fid_ $k
     $tcpsrc($i,$j) set window_ 2000
     $ns attach-agent $A($i) $tcpsrc($i,$j)
-#TODO: wrzucić jako funkcje
-#    $ns attach-agent $B(1) $tcp_snk($i,$j)
-    $ns attach-agent $B(1) $tcp_snk($i,$j)
+    $ns attach-agent $B($i) $tcp_snk($i,$j)
     $ns connect $tcpsrc($i,$j) $tcp_snk($i,$j)
     set ftp($i,$j) [$tcpsrc($i,$j) attach-source FTP]
   }
@@ -234,7 +229,7 @@ for {set j 1} {$j<=$NodeCount} { incr j } {
  
 
 
-$ns at 0.5 "countFlows 1 3"
+#$ns at 0.5 "countFlows 1 3"
 #$ns at [expr $sduration - 0.01] "$linnkFlowMonitor dump"
 $ns at [expr $sduration - 0.001] "$qAC printStats"
 $ns at $sduration "finish"
