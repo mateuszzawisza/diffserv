@@ -2,7 +2,8 @@ global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk
 # The following procedure is called whenever a connection ends
 Agent/TCP instproc done {} {
 global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk RandomFileSize 
-logMessage "connection ended!"
+puts -nonewline "."
+#logMessage "connection ended!"
   # print in $TransferLogFile: node, session, start time,  end time, duration,      
   # trans-pkts, transm-bytes, retrans-bytes, throughput   
 
@@ -17,6 +18,12 @@ logMessage "connection ended!"
 
       countFlows [$self set node] 0
 
+  global connectionsLeft
+  set connectionsLeft [expr $connectionsLeft - 1]
+
+  if {$connectionsLeft < 1} {
+    [finish]
+  }
 }
 
 proc countFlows { ind sign } {
@@ -41,9 +48,9 @@ proc countFlows { ind sign } {
 }
 
 proc logMessage { message } {
-  puts "\n\n*****************************************\n"
-  puts $message
-  puts "\n*****************************************\n\n"
+#  puts "\n\n*****************************************\n"
+#  puts $message
+#  puts "\n*****************************************\n\n"
 }
 
 proc setQueue {ns s d a b nodeCount} {
@@ -52,15 +59,12 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD meanPktSize 40
   $queueSD set numQueues_ 1
   $queueSD setNumPrec 2
-#  $queueSD addPolicyEntry [$s id] [$d id] TSW2CM 10 3000 0.02
   $queueSD addPolicerEntry TSW2CM 10 11
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
   $queueSD configQ 0 0 10 30 0.1
   $queueSD configQ 0 1 10 30 0.1
   
-  $queueSD printPolicyTable
-  $queueSD printPolicerTable
 
   set queueDS [[$ns link $d $s] queue]
   $queueDS meanPktSize      40
@@ -79,21 +83,29 @@ proc setQueue {ns s d a b nodeCount} {
 
   for {set i 1} {$i<=$nodeCount} { incr i } {
     for {set j 1} {$j<=$nodeCount} { incr j } {
-      puts "A($i) = [$A($i) id]    AND     B($j) = [$B($j) id]"
+      puts "A($i) = [$A($i) id]    --->     B($j) = [$B($j) id]"
       $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW2CM 10 $cir 0.02
-      puts "A($i) = [$B($i) id]    AND     B($j) = [$A($j) id]"
+      puts "A($i) = [$A($j) id]    <---     B($i) = [$B($j) id]"
+#      puts "A($i) = [$B($i) id]    --->     B($j) = [$A($j) id]"
       $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW2CM 10 $cir 0.02
     }
   }
+
+  $queueSD printPolicyTable
+  $queueSD printPolicerTable
+
+  $queueDS printPolicyTable
+  $queueDS printPolicerTable
 
   return [list $queueSD $queueDS]
 }
 
 proc finish {} {
   logMessage "finished"
-  global ns tf file2
+  global ns qAC
   $ns flush-trace
-  close $file2 
+  puts "\n\nFinished.\n\n"
+  $qAC printStats
   exit 0
 }         
 
@@ -103,21 +115,17 @@ proc finish {} {
 set ns [new Simulator] 
 
 set TransferLogFile [open output/TransferLogFile.ns w];   # file containing transfer 
-                           # times of different connections
-set ConnectionNumberLogFile [open output/ConnectionNumberLogFile.tr w]; # file containing the number of connections 
-
-set tf   [open output/out.tr w];  # Open the Trace file
-
-set file2 [open output/out.nam w]
 set LinkLogFile [open output/link_AC_log.tr w]
 
 set pktSize      1000; # packet size
-set NodeCount    3;   # Number of source nodes
-set FlowsCount   6;   # Number of flows per source node 
+set NodeCount    4;   # Number of source nodes
+set FlowsCount   100;   # Number of flows per source node 
 set throughput   6Mb;  # router's thorughput
-set sduration    100;  # symulation duration
+set sduration    10000;  # symulation duration
 
-#$ns trace-all $tf    
+#$ns trace-all $traceFile    
+
+set connectionsLeft [expr $FlowsCount * $NodeCount]
 
 
 
@@ -227,11 +235,7 @@ for {set j 1} {$j<=$NodeCount} { incr j } {
   set Cnts($j) 0
 }   
  
+puts "\n\nRunning!\n\n"
 
-
-#$ns at 0.5 "countFlows 1 3"
-#$ns at [expr $sduration - 0.01] "$linnkFlowMonitor dump"
-$ns at [expr $sduration - 0.001] "$qAC printStats"
-$ns at $sduration "finish"
 
 $ns run
