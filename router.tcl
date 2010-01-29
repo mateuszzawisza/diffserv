@@ -1,15 +1,15 @@
 # The following procedure is called whenever a connection ends
 Agent/TCP instproc done {} {
+global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk RandomFileSize 
 logMessage "connection ended!"
-  global tcpsrc NodeNb NumberFlows ns RV ftp Out tcp_snk RVSize 
-  # print in $Out: node, session, start time,  end time, duration,      
+  # print in $TransferLogFile: node, session, start time,  end time, duration,      
   # trans-pkts, transm-bytes, retrans-bytes, throughput   
 
   set duration [expr [$ns now] - [$self set starts] ] 
   set i [$self set node] 
   set j [$self set sess] 
   set time [$ns now] 
-  puts $Out "$i \t $j \t $time \t\
+  puts $TransferLogFile "$i \t $j \t $time \t\
       $time \t $duration \t [$self set ndatapack_] \t\
       [$self set ndatabytes_] \t [$self set  nrexmitbytes_] \t\
       [expr [$self set ndatabytes_]/$duration ]"    
@@ -19,21 +19,21 @@ logMessage "connection ended!"
 }
 
 proc countFlows { ind sign } {
-  global Cnts Conn NodeNb
+  global Cnts ConnectionNumberLogFile NodeCount
   set ns [Simulator instance]
   if { $sign==0 } {
     set Cnts($ind) [expr $Cnts($ind) - 1] 
   } elseif { $sign==1 } {
     set Cnts($ind) [expr $Cnts($ind) + 1] 
   } else { 
-    puts -nonewline $Conn "[$ns now] \t"
+    puts -nonewline $ConnectionNumberLogFile "[$ns now] \t"
     set sum 0
-    for {set j 1} {$j<=$NodeNb} { incr j } {
-      puts -nonewline $Conn "$Cnts($j) \t"
+    for {set j 1} {$j<=$NodeCount} { incr j } {
+      puts -nonewline $ConnectionNumberLogFile "$Cnts($j) \t"
       set sum [expr $sum + $Cnts($j)]
     }
-    puts $Conn "$sum"
-    puts $Conn ""
+    puts $ConnectionNumberLogFile "$sum"
+    puts $ConnectionNumberLogFile ""
     $ns at [expr [$ns now] + 0.2] "countFlows 1 3"
     puts "in count"
   }
@@ -88,36 +88,65 @@ proc finish {} {
 
 set ns [new Simulator] 
 
-set Out [open output/Out.ns w];   # file containing transfer 
+set TransferLogFile [open output/TransferLogFile.ns w];   # file containing transfer 
                            # times of different connections
-set Conn [open output/Conn.tr w]; # file containing the number of connections 
+set ConnectionNumberLogFile [open output/ConnectionNumberLogFile.tr w]; # file containing the number of connections 
 
 set tf   [open output/out.tr w];  # Open the Trace file
 
 set file2 [open output/out.nam w]
+set LinkLogFile [open output/link_AC_log.tr w]
 
-set pktSize    1000
-set NodeNb       3;# Number of source nodes
-set NumberFlows 16 ; # Number of flows per source node 
-set throughput 6Mb
-set sduration 100
-$ns trace-all $tf    
+set pktSize      1000; # packet size
+set NodeCount    3;    # Number of source nodes
+set FlowsCount  16;   # Number of flows per source node 
+set throughput   6Mb;  # router's thorughput
+set sduration    100;  # symulation duration
+
+#$ns trace-all $tf    
 
 
 
+###############################  MAIN NODES  ###############################
 
 set Agw [$ns node]
 set Bgw [$ns node]
 set Core [$ns node]
-set flink [$ns simplex-link $Agw $Bgw 10Mb 1ms dsRED/core]
+#set flink [$ns simplex-link $Agw $Bgw 10Mb 1ms DropTail]
+#set glink [$ns simplex-link $Bgw $Agw 10Mb 1ms DropTail]
 
-$ns duplex-link $Agw $Core $throughput 0.1ms dsRED/edge
+
+###############################  MAIN LINKS  ###############################
+
+set linkAC [$ns duplex-link $Agw $Core $throughput 0.1ms dsRED/edge]
 $ns queue-limit  $Core $Agw  100
 
-$ns duplex-link $Bgw $Core $throughput 0.1ms dsRED/edge
+#set linkBC [$ns duplex-link $Bgw $Core $throughput 0.1ms dsRED/core]
+set linkBC [$ns duplex-link $Bgw $Core $throughput 0.1ms DropTail]
 $ns queue-limit  $Core $Bgw  100
 
-for {set i 1} {$i <= $NodeNb} {incr i} {
+
+
+###############################  FLOW MONITOR  ###############################
+
+#set linnkFlowMonitor [$ns makeflowmon Fid]
+# $ns attach-fmon $linkAC $linnkFlowMonitor
+# $linnkFlowMonitor attach $LinkLogFile
+
+
+###############################  QUEUES  ###############################
+
+# set q1 [setQueue $ns $Bgw $Core]
+# set qBC [lindex $q1 0]
+# set qCB [lindex $q1 1]
+
+set q2 [setQueue $ns $Agw $Core]
+set qAC [lindex $q2 0]
+set qCA [lindex $q2 1]
+
+###############################  END NODES AND LINKS  ###############################
+
+for {set i 1} {$i <= $NodeCount} {incr i} {
   set A($i) [$ns node]
   $ns duplex-link $Agw $A($i) $throughput 0.01ms DropTail
   $ns queue-limit $A($i) $Agw 100
@@ -127,35 +156,20 @@ for {set i 1} {$i <= $NodeNb} {incr i} {
   $ns queue-limit $B($i) $Bgw 100
 }
 
-#diff serv  
 
-set q1 [setQueue $ns $Bgw $Core]
-set qBC [lindex $q1 0]
-set qCB [lindex $q1 1]
+###############################  SOURCES  ###############################
 
-set q2 [setQueue $ns $Agw $Core]
-set qAC [lindex $q2 0]
-set qCA [lindex $q2 1]
-
-
-
-
-
-set monfile [open output/mon.tr w]
-set fmon [$ns makeflowmon Fid]
-$ns attach-fmon $flink $fmon
-$fmon attach $monfile
-
-#TCP Sources, destinations, connections
 logMessage "setting up sources"
-for {set i 1} {$i<=$NodeNb} { incr i } {
-  for {set j 1} {$j<=$NumberFlows} { incr j } {
+for {set i 1} {$i<=$NodeCount} { incr i } {
+  for {set j 1} {$j<=$FlowsCount} { incr j } {
     set tcpsrc($i,$j) [new Agent/TCP/Newreno]
     set tcp_snk($i,$j) [new Agent/TCPSink]
     set k [expr $i*1000 +$j];
     $tcpsrc($i,$j) set fid_ $k
     $tcpsrc($i,$j) set window_ 2000
     $ns attach-agent $A($i) $tcpsrc($i,$j)
+#TODO: wrzucić jako funkcje
+#    $ns attach-agent $B(1) $tcp_snk($i,$j)
     $ns attach-agent $Agw $tcp_snk($i,$j)
     $ns connect $tcpsrc($i,$j) $tcp_snk($i,$j)
     set ftp($i,$j) [$tcpsrc($i,$j) attach-source FTP]
@@ -163,52 +177,52 @@ for {set i 1} {$i<=$NodeNb} { incr i } {
 }
 logMessage "Generators for random size of files."
 # Generators for random size of files. 
-set rng1 [new RNG]
-$rng1 seed 22
+set randomNumberGenerator [new RNG]
+$randomNumberGenerator seed 22
 
 # Random inter-arrival times of TCP transfer at each source i
-set RV [new RandomVariable/Exponential]
-$RV set avg_ 0.2
-$RV use-rng $rng1 
+set randomVariable [new RandomVariable/Exponential]
+$randomVariable set avg_ 0.2
+$randomVariable use-rng $randomNumberGenerator 
 
 logMessage "Random size of files to transmit"
-set RVSize [new RandomVariable/Pareto]
-$RVSize set avg_ 10000 
-$RVSize set shape_ 1.25
-$RVSize use-rng $rng1
+set RandomFileSize [new RandomVariable/Pareto]
+$RandomFileSize set avg_ 10000 
+$RandomFileSize set shape_ 1.25
+$RandomFileSize use-rng $randomNumberGenerator
 
 # dummy command
-set t [$RVSize value]
+#set t [$RandomFileSize value]
 
 # We now define the beginning times of transfers and the transfer sizes
 # Arrivals of sessions follow a Poisson process.
-#
+
 logMessage "defining beginning times of transfers"
-for {set i 1} {$i<=$NodeNb} { incr i } {
+for {set i 1} {$i<=$NodeCount} { incr i } {
   set t [$ns now]
 
-  for {set j 1} {$j<=$NumberFlows} { incr j } {
+  for {set j 1} {$j<=$FlowsCount} { incr j } {
 	  # set the beginning time of next transfer from source and attributes
 	  $tcpsrc($i,$j) set sess $j
 	  $tcpsrc($i,$j) set node $i
-	  set t [expr $t + [$RV value]]
+	  set t [expr $t + [$randomVariable value]]
 	  $tcpsrc($i,$j) set starts $t
-    $tcpsrc($i,$j) set size [expr [$RVSize value]]
+    $tcpsrc($i,$j) set size [expr [$RandomFileSize value]]
     $ns at [$tcpsrc($i,$j) set starts] "$ftp($i,$j) send [$tcpsrc($i,$j) set size]"
-    $ns at [$tcpsrc($i,$j) set starts ] "countFlows $i 1"
+    $ns at [$tcpsrc($i,$j) set starts] "countFlows $i 1"
   }
 }
 
 logMessage "setting smthng"
-for {set j 1} {$j<=$NodeNb} { incr j } {
+for {set j 1} {$j<=$NodeCount} { incr j } {
   set Cnts($j) 0
 }   
-  
+ 
 
 
 $ns at 0.5 "countFlows 1 3"
-$ns at [expr $sduration - 0.01] "$fmon dump"
-$ns at [expr $sduration - 0.001] "$qBC printStats"
+#$ns at [expr $sduration - 0.01] "$linnkFlowMonitor dump"
+$ns at [expr $sduration - 0.001] "$qAC printStats"
 $ns at $sduration "finish"
 
 $ns run
