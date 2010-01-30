@@ -37,8 +37,10 @@ def set_queue_params(queue_params)
   end
 end
 
-queue_params = [[10, 20, 0.1,10, 20, 0.1],
-                [10, 20, 0.1,10, 20, 0.1],
-                [10, 20, 0.1,10, 20, 0.1]]
+# minimum threshold, maximum threshold, dropping probability
+#                [   SD    ] [    DS    ]
+queue_params = [[10, 20, 0.1,10, 20, 0.1], #10
+                [10, 20, 0.1,10, 20, 0.1], #11
+                [10, 20, 0.1,10, 20, 0.1]] #12
 
 set_queue_params queue_params
