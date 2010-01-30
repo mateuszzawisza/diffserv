@@ -42,8 +42,17 @@ class Simulation
     self.output = eval "%x[#{ self.command }]"
   end
   
-  def parse_outuput
-    puts self.output
+  def result
+    table_text = self.output.split(/^=+$/).last
+    table = table_text.split("\n").collect do |line|
+      line.split(/(\t|\ )+/).delete_if {|str| str.empty? or str.match(/^(\t|\ )+$/)}
+    end
+    table.delete_at 2
+    table.delete_at 0
+    names = table.shift
+    hashed_table = table.inject({}) {|sum, val| sum.merge({val.delete_at(0) => val})}
+    puts "headers: #{names.join(' | ')}"
+    return hashed_table
   end
 
   # this is a function that saves params to a file and exmple of the table that needs to be set
@@ -60,6 +69,7 @@ class Simulation
 end
 
 
-puts "Running simulations..."
-simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'
-puts "da enda"
+#puts "Running simulations..."
+#simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'
+#puts "da enda"
+puts "Run:\n   simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'"
