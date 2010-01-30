@@ -62,7 +62,7 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD addPolicerEntry TSW3CM 10 11 12
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
-  $queueSD addPHBEntry  12 0 3 
+  $queueSD addPHBEntry  12 0 2 
   $queueSD configQ 0 0 10 30 0.1
   $queueSD configQ 0 1 10 30 0.1
   $queueSD configQ 0 2 10 30 0.1
@@ -75,7 +75,7 @@ proc setQueue {ns s d a b nodeCount} {
   $queueDS addPolicerEntry TSW3CM 10 11 12
   $queueDS addPHBEntry  10 0 0 
   $queueDS addPHBEntry  11 0 1 
-  $queueDS addPHBEntry  12 0 1 
+  $queueDS addPHBEntry  12 0 2 
   $queueDS configQ 0 0 10 20 0.1
   $queueDS configQ 0 1 10 20 0.1
   $queueDS configQ 0 2 10 20 0.1
