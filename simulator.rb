@@ -7,9 +7,6 @@ VARIABLES_MAP = {
   :link_throughput => 'THROUGHPUT'
 }
 
-
-puts "Running simulations..."
-
 def run_simulation(options={})
   variables = options.collect do |variable_name, value|
     env_variable_name = VARIABLES_MAP[variable_name]
@@ -19,6 +16,6 @@ def run_simulation(options={})
   system "#{variables.join(" ")} #{SIMULATION_COMMAND}"
 end
 
-run_simulation :node_count => 3
-
+puts "Running simulations..."
+run_simulation :node_count => 3#, :packet_size => 100, :flows_count => 100, :link_throughput => '6Mb'
 puts "da enda"

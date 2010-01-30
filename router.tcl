@@ -59,7 +59,6 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD meanPktSize 40
   $queueSD set numQueues_ 1
   $queueSD setNumPrec 2
-#  $queueSD addPolicyEntry [$s id] [$d id] TSW2CM 10 3000 0.02
   $queueSD addPolicerEntry TSW3CM 10 11 12
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
