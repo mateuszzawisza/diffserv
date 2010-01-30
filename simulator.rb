@@ -1,3 +1,6 @@
+#!/usr/bin/env ruby
+
+
 SIMULATION_COMMAND = "ns router.tcl"
 
 VARIABLES_MAP = {
@@ -36,6 +39,28 @@ class Simulation
   end
 end
 
+
 puts "Running simulations..."
 simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'
 puts "da enda"
+
+
+
+# this is function that saves params to fiel and exmple of table that needs to be set
+def set_queue_params(queue_params)
+  queues = []
+  queue_params.each {|qp| queues << qp.join(" ")}
+  queues = queues.join("\n")
+  queues_file = File.open("queue_params", "w") do |file|
+    puts queues
+    file.write queues 
+  end
+end
+
+# minimum threshold, maximum threshold, dropping probability
+#                [   SD    ] [    DS    ]
+queue_params = [[10, 20, 0.1,10, 20, 0.1], #10
+                [10, 20, 0.1,10, 20, 0.1], #11
+                [10, 20, 0.1,10, 20, 0.1]] #12
+
+set_queue_params queue_params

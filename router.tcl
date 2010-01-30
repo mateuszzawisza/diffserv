@@ -54,6 +54,10 @@ proc logMessage { message } {
 }
 
 proc setQueue {ns s d a b nodeCount} {
+
+  global queueParams
+  global cir pir
+
   logMessage "setting up a queue"
   set queueSD [[$ns link $s $d] queue]
   $queueSD meanPktSize 40
@@ -63,9 +67,9 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
   $queueSD addPHBEntry  12 0 2 
-  $queueSD configQ 0 0 10 30 0.1
-  $queueSD configQ 0 1 10 30 0.1
-  $queueSD configQ 0 2 10 30 0.1
+  $queueSD configQ 0 0 $queueParams(10,1) $queueParams(10,2) $queueParams(10,3)
+  $queueSD configQ 0 1 $queueParams(11,1) $queueParams(11,2) $queueParams(11,3)
+  $queueSD configQ 0 2 $queueParams(12,1) $queueParams(12,2) $queueParams(12,3)
   
 
   set queueDS [[$ns link $d $s] queue]
@@ -76,11 +80,9 @@ proc setQueue {ns s d a b nodeCount} {
   $queueDS addPHBEntry  10 0 0 
   $queueDS addPHBEntry  11 0 1 
   $queueDS addPHBEntry  12 0 2 
-  $queueDS configQ 0 0 10 20 0.1
-  $queueDS configQ 0 1 10 20 0.1
-  $queueDS configQ 0 2 10 20 0.1
-
-  set cir 3000
+  $queueDS configQ 0 0 $queueParams(10,4) $queueParams(10,5) $queueParams(10,6)
+  $queueDS configQ 0 1 $queueParams(11,4) $queueParams(11,5) $queueParams(11,6)
+  $queueDS configQ 0 2 $queueParams(12,4) $queueParams(12,5) $queueParams(12,6)
 
   upvar $a A
   upvar $b B
@@ -88,9 +90,9 @@ proc setQueue {ns s d a b nodeCount} {
   for {set i 1} {$i<=$nodeCount} { incr i } {
     for {set j 1} {$j<=$nodeCount} { incr j } {
       puts "A($i) = [$A($i) id]    --->     B($j) = [$B($j) id]"
-      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM 10 $cir 10000
+      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM 10 $cir $pir
       puts "A($i) = [$A($j) id]    <---     B($i) = [$B($j) id]"
-      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM 10 $cir 10000
+      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM 10 $cir $pir
     }
   }
 
@@ -124,6 +126,25 @@ proc readFromEnvOrDefault {variableName defaultValue} {
   }
 }
 
+proc initQueueParams {} {
+  set QueuesParamsFile [open "queue_params" r]
+  set QueuesParamsRead [read $QueuesParamsFile] 
+  set QueuesParamsLines [split $QueuesParamsRead "\n"]
+  
+  set codePoint 10
+  
+  foreach line $QueuesParamsLines {
+    set values [split $line " "]
+    set i 1
+    foreach value $values {
+      set queueParams($codePoint,$i) $value 
+      incr i
+    }
+    incr codePoint
+  }
+  return [array get queueParams]
+}
+
 #########################################################################################################
 
 
@@ -140,6 +161,18 @@ set throughput [readFromEnvOrDefault THROUGHPUT  6Mb ]; # router's thorughput
 #$ns trace-all $traceFile    
 
 set connectionsLeft [expr $FlowsCount * $NodeCount]
+
+
+
+# setting up queues attributes
+
+set cir 3000 
+set pir 10000
+
+
+array set queueParams [initQueueParams]
+ 
+
 
 ###############################  MAIN NODES  ###############################
 
