@@ -1,3 +1,6 @@
+#!/usr/bin/env ruby
+
+
 SIMULATION_COMMAND = "ns router.tcl"
 
 VARIABLES_MAP = {
