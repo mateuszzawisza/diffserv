@@ -117,11 +117,10 @@ set ns [new Simulator]
 set TransferLogFile [open output/TransferLogFile.ns w];   # file containing transfer 
 set LinkLogFile [open output/link_AC_log.tr w]
 
-set pktSize      1000; # packet size
-set NodeCount    4;   # Number of source nodes
-set FlowsCount   100;   # Number of flows per source node 
-set throughput   6Mb;  # router's thorughput
-set sduration    10000;  # symulation duration
+set pktSize      1000;  # packet size
+set NodeCount    4;     # Number of source nodes
+set FlowsCount   1000;  # Number of flows per source node 
+set throughput   6Mb;   # router's thorughput
 
 #$ns trace-all $traceFile    
 
@@ -148,9 +147,10 @@ $ns queue-limit  $Core $Bgw  100
 
 ###############################  FLOW MONITOR  ###############################
 
-# set linnkFlowMonitor [$ns makeflowmon Fid]
-# $ns attach-fmon $linkAC $linnkFlowMonitor
-# $linnkFlowMonitor attach $LinkLogFile
+# set linkFlowMonitor [$ns makeflowmon Fid]
+# $ns attach-fmon $linkAC $linkFlowMonitor
+# $linkFlowMonitor attach $LinkLogFile
+
 
 
 ###############################  END NODES AND LINKS  ###############################
