@@ -109,6 +109,18 @@ proc finish {} {
   exit 0
 }         
 
+proc readFromEnvOrDefault {variableName defaultValue} {
+  global env
+  if { [info exists env($variableName)] } {
+    set passedValue $env($variableName)
+    puts "$variableName set to $passedValue"
+    return $passedValue
+  } else {
+    puts "$variableName not found, defaulted to $defaultValue"
+    return $defaultValue
+  }
+}
+
 #########################################################################################################
 
 
@@ -117,16 +129,15 @@ set ns [new Simulator]
 set TransferLogFile [open output/TransferLogFile.ns w];   # file containing transfer 
 set LinkLogFile [open output/link_AC_log.tr w]
 
-set pktSize      1000;  # packet size
-set NodeCount    4;     # Number of source nodes
-set FlowsCount   1000;  # Number of flows per source node 
-set throughput   6Mb;   # router's thorughput
+
+set packetSize [readFromEnvOrDefault PACKET_SIZE 1000]; # packet size
+set NodeCount  [readFromEnvOrDefault NODE_COUNT  4   ]; # Number of source nodes
+set FlowsCount [readFromEnvOrDefault FLOWS_COUNT 1000]; # Number of flows per source node 
+set throughput [readFromEnvOrDefault THROUGHPUT  6Mb ]; # router's thorughput
 
 #$ns trace-all $traceFile    
 
 set connectionsLeft [expr $FlowsCount * $NodeCount]
-
-
 
 ###############################  MAIN NODES  ###############################
 
