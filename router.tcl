@@ -53,11 +53,13 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD set numQueues_ 1
   $queueSD setNumPrec 2
 #  $queueSD addPolicyEntry [$s id] [$d id] TSW2CM 10 3000 0.02
-  $queueSD addPolicerEntry TSW2CM 10 11
+  $queueSD addPolicerEntry TSW3CM 10 11 12
   $queueSD addPHBEntry  10 0 0 
   $queueSD addPHBEntry  11 0 1 
+  $queueSD addPHBEntry  12 0 3 
   $queueSD configQ 0 0 10 30 0.1
   $queueSD configQ 0 1 10 30 0.1
+  $queueSD configQ 0 2 10 30 0.1
   
   $queueSD printPolicyTable
   $queueSD printPolicerTable
@@ -66,11 +68,13 @@ proc setQueue {ns s d a b nodeCount} {
   $queueDS meanPktSize      40
   $queueDS set numQueues_   1
   $queueDS setNumPrec      2
-  $queueDS addPolicerEntry TSW2CM 10 11
+  $queueDS addPolicerEntry TSW3CM 10 11 12
   $queueDS addPHBEntry  10 0 0 
   $queueDS addPHBEntry  11 0 1 
+  $queueDS addPHBEntry  12 0 1 
   $queueDS configQ 0 0 10 20 0.1
   $queueDS configQ 0 1 10 20 0.1
+  $queueDS configQ 0 2 10 20 0.1
 
   set cir 3000
 
@@ -80,9 +84,9 @@ proc setQueue {ns s d a b nodeCount} {
   for {set i 1} {$i<=$nodeCount} { incr i } {
     for {set j 1} {$j<=$nodeCount} { incr j } {
       puts "A($i) = [$A($i) id]    AND     B($j) = [$B($j) id]"
-      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW2CM 10 $cir 0.02
+      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM 10 $cir 10000
       puts "A($i) = [$B($i) id]    AND     B($j) = [$A($j) id]"
-      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW2CM 10 $cir 0.02
+      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM 10 $cir 10000
     }
   }
 
@@ -112,8 +116,8 @@ set file2 [open output/out.nam w]
 set LinkLogFile [open output/link_AC_log.tr w]
 
 set pktSize      1000; # packet size
-set NodeCount    3;   # Number of source nodes
-set FlowsCount   6;   # Number of flows per source node 
+set NodeCount    4;   # Number of source nodes
+set FlowsCount   200;   # Number of flows per source node 
 set throughput   6Mb;  # router's thorughput
 set sduration    100;  # symulation duration
 
