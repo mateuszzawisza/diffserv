@@ -132,7 +132,7 @@ set LinkLogFile [open output/link_AC_log.tr w]
 
 set packetSize [readFromEnvOrDefault PACKET_SIZE 1000]; # packet size
 set NodeCount  [readFromEnvOrDefault NODE_COUNT  4   ]; # Number of source nodes
-set FlowsCount [readFromEnvOrDefault FLOWS_COUNT 1000]; # Number of flows per source node 
+set FlowsCount [readFromEnvOrDefault FLOWS_COUNT 10  ]; # Number of flows per source node 
 set throughput [readFromEnvOrDefault THROUGHPUT  6Mb ]; # router's thorughput
 
 #$ns trace-all $traceFile    
