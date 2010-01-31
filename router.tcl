@@ -84,6 +84,15 @@ proc setQueue {ns s d a b nodeCount} {
   $queueDS configQ 0 1 $queueParams(11,4) $queueParams(11,5) $queueParams(11,6)
   $queueDS configQ 0 2 $queueParams(12,4) $queueParams(12,5) $queueParams(12,6)
 
+
+
+  puts "queueSD configQ 0 0 $queueParams(10,1) $queueParams(10,2) $queueParams(10,3)"
+  puts "queueSD configQ 0 1 $queueParams(11,1) $queueParams(11,2) $queueParams(11,3)"
+  puts "queueSD configQ 0 2 $queueParams(12,1) $queueParams(12,2) $queueParams(12,3)"
+  puts "queueDS configQ 0 0 $queueParams(10,4) $queueParams(10,5) $queueParams(10,6)"
+  puts "queueDS configQ 0 1 $queueParams(11,4) $queueParams(11,5) $queueParams(11,6)"
+  puts "queueDS configQ 0 2 $queueParams(12,4) $queueParams(12,5) $queueParams(12,6)"
+
   upvar $a A
   upvar $b B
 

@@ -11,7 +11,7 @@ VARIABLES_MAP = {
 }
 
 class Simulation
-  attr_accessor :command, :output
+  attr_accessor :command, :output, :queue_settings
 
   def self.run!(options={})
     sim = self.new(options)
@@ -26,7 +26,7 @@ class Simulation
                            [10, 20, 0.1,10, 20, 0.1], #11
                            [10, 20, 0.1,10, 20, 0.1]] #12
     
-    set_queue_settings options.delete(:queue_settings) || default_queue_settings
+    self.queue_settings = options.delete(:queue_settings) || default_queue_settings
 
     variables = options.collect do |variable_name, value|
       env_variable_name = VARIABLES_MAP[variable_name]
@@ -38,6 +38,7 @@ class Simulation
   end
 
   def run
+    self.set_queue_settings
     puts "Issuing:\n  #{self.command}"
     self.output = eval "%x[#{ self.command }]"
   end
@@ -56,9 +57,9 @@ class Simulation
   end
 
   # this is a function that saves params to a file and exmple of the table that needs to be set
-  def set_queue_settings(queue_params)
+  def set_queue_settings
     queues = []
-    queue_params.each {|qp| queues << qp.join(" ")}
+    self.queue_settings.each {|qp| queues << qp.join(" ")}
     queues = queues.join("\n")
     puts "Queue settings:\n-----------\n#{queues}\n-----------"
     queues_file = File.open("queue_params", "w") do |file|
