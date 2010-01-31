@@ -241,6 +241,7 @@ for {set i 1} {$i <= $NodeCount} { incr i } {
     set k [expr $i*1000 +$j];
     $tcpsrc($i,$j) set fid_ $k
     $tcpsrc($i,$j) set window_ 2000
+    $tcpsrc($i,$j) set packetSize_ $packetSize
     $ns attach-agent $A($i) $tcpsrc($i,$j)
     $ns attach-agent $B($i) $tcp_snk($i,$j)
     $ns connect $tcpsrc($i,$j) $tcp_snk($i,$j)
