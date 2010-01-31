@@ -20,6 +20,14 @@ class Simulation
   end
 
   def initialize(options={})
+    # minimum threshold, maximum threshold, dropping probability
+    #                [   SD    ] [    DS    ]
+    default_queue_settings = [[10, 20, 0.1,10, 20, 0.1], #10
+                           [10, 20, 0.1,10, 20, 0.1], #11
+                           [10, 20, 0.1,10, 20, 0.1]] #12
+    
+    set_queue_settings options.delete(:queue_settings) || default_queue_settings
+
     variables = options.collect do |variable_name, value|
       env_variable_name = VARIABLES_MAP[variable_name]
       raise Exception.new("Variable #{variable_name} is not defined!") unless env_variable_name
@@ -27,14 +35,6 @@ class Simulation
     end
     self.command = "#{variables.join(" ")} #{SIMULATION_COMMAND}"
     puts "Created command:\n  #{self.command}"
-
-    # minimum threshold, maximum threshold, dropping probability
-    #                [   SD    ] [    DS    ]
-    queue_params = [[10, 20, 0.1,10, 20, 0.1], #10
-                    [10, 20, 0.1,10, 20, 0.1], #11
-                    [10, 20, 0.1,10, 20, 0.1]] #12
-    
-    set_queue_params queue_params
   end
 
   def run
@@ -56,12 +56,12 @@ class Simulation
   end
 
   # this is a function that saves params to a file and exmple of the table that needs to be set
-  def set_queue_params(queue_params)
+  def set_queue_settings(queue_params)
     queues = []
     queue_params.each {|qp| queues << qp.join(" ")}
     queues = queues.join("\n")
+    puts "Queue settings:\n-----------\n#{queues}\n-----------"
     queues_file = File.open("queue_params", "w") do |file|
-      puts queues
       file.write queues 
     end
   end
