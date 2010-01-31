@@ -7,7 +7,9 @@ VARIABLES_MAP = {
   :packet_size => 'PACKET_SIZE',
   :node_count => 'NODE_COUNT',
   :flows_count => 'FLOWS_COUNT',
-  :link_throughput => 'THROUGHPUT'
+  :link_throughput => 'THROUGHPUT',
+  :cir => 'CIR',
+  :pir => 'PIR'
 }
 
 class Simulation
@@ -73,4 +75,4 @@ end
 #puts "Running simulations..."
 #simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'
 #puts "da enda"
-puts "Run:\n   simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'"
+puts "Run:\n   simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10, :link_throughput => '6Mb', :cir => 3000, :pir => 10000"

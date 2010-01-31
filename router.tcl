@@ -175,8 +175,8 @@ set connectionsLeft [expr $FlowsCount * $NodeCount]
 
 # setting up queues attributes
 
-set cir 3000 
-set pir 10000
+set cir [readFromEnvOrDefault CIR  3000]; # end-users' cir value
+set pir [readFromEnvOrDefault PIR 10000]; # end-users' pir value
 
 
 array set queueParams [initQueueParams]
