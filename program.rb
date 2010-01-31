@@ -7,8 +7,10 @@ simulation2 = Simulation.new :node_count => 3, :packet_size => 10000, :flows_cou
 
 simulation1.run and simulation2.run
 
+puts "\nFirst simulation:"
 puts simulation1.result.inspect
+puts "\nSecond simulation:"
 puts simulation2.result.inspect
 
-puts simulation1.output
-puts simulation2.output
+#puts simulation1.output
+#puts simulation2.output
