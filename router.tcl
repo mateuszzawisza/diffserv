@@ -98,7 +98,7 @@ proc setQueue {ns s d a b nodeCount} {
 
   for {set i 1} {$i<=$nodeCount} { incr i } {
     for {set j 1} {$j<=$nodeCount} { incr j } {
-      if {[expr $i / 2] < $nodeCount} {
+      if {$i < [expr $nodeCount / 2]} {
         set codepoint 10
       } else {
         set codepoint 11
