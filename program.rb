@@ -5,9 +5,9 @@ q2 = [[10, 20, 0.9,10, 20, 0.9], [10, 20, 0.9, 10, 20, 0.9], [10, 20, 0.9, 10, 2
 
 settings = { :node_count => 3,
              :packet_size => 1000,
-             :flows_count => 1000,
-             :link_throughput => '0.5Mb',
-             :cir => 100, :pir => 100,
+             :flows_count => 100,
+             :link_throughput => '4Mb',
+             :cir => 30000, :pir => 60000,
              :average_source_delay => '0.01'
            }
 
