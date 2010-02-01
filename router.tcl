@@ -70,19 +70,21 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD configQ 0 0 $queueParams(10,1) $queueParams(10,2) $queueParams(10,3)
   $queueSD configQ 0 1 $queueParams(11,1) $queueParams(11,2) $queueParams(11,3)
   $queueSD configQ 0 2 $queueParams(12,1) $queueParams(12,2) $queueParams(12,3)
-  
+  $queueSD printPHBTable
 
   set queueDS [[$ns link $d $s] queue]
   $queueDS meanPktSize      40
   $queueDS set numQueues_   1
   $queueDS setNumPrec      2
-  $queueDS addPolicerEntry TSW3CM 10 11 12
+  #$queueDS addPolicerEntry TSW3CM 10 11 12
+  $queueSD setMREDMode RIO-D
   $queueDS addPHBEntry  10 0 0 
   $queueDS addPHBEntry  11 0 1 
   $queueDS addPHBEntry  12 0 2 
   $queueDS configQ 0 0 $queueParams(10,4) $queueParams(10,5) $queueParams(10,6)
   $queueDS configQ 0 1 $queueParams(11,4) $queueParams(11,5) $queueParams(11,6)
   $queueDS configQ 0 2 $queueParams(12,4) $queueParams(12,5) $queueParams(12,6)
+  $queueDS printPHBTable
 
 
 
@@ -107,8 +109,8 @@ proc setQueue {ns s d a b nodeCount} {
       puts "A($i) = [$A($i) id]    --->     B($j) = [$B($j) id]"
       $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM $codepoint $cir $pir
       puts "queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM $codepoint $cir $pir"
-      puts "A($i) = [$A($j) id]    <---     B($i) = [$B($j) id]"
-      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM $codepoint $cir $pir
+     # puts "A($i) = [$A($j) id]    <---     B($i) = [$B($j) id]"
+     # $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM $codepoint $cir $pir
     }
   }
 
@@ -143,8 +145,8 @@ proc setQueue {ns s d a b nodeCount} {
   $queueSD printPolicyTable
   $queueSD printPolicerTable
 
-  $queueDS printPolicyTable
-  $queueDS printPolicerTable
+  #$queueDS printPolicyTable
+  #$queueDS printPolicerTable
 
   return [list $queueSD $queueDS]
 }
@@ -227,11 +229,13 @@ set Core [$ns node]
 
 ###############################  MAIN LINKS  ###############################
 
-set linkAC [$ns duplex-link $Agw $Core $throughput 0.1ms dsRED/edge]
+set linkAC [$ns simplex-link $Agw $Core $throughput 0.1ms dsRED/edge]
+set linkCA [$ns simplex-link $Core $Agw $throughput 0.1ms dsRED/core]
 $ns queue-limit  $Core $Agw  100
 
 #set linkBC [$ns duplex-link $Bgw $Core $throughput 0.1ms dsRED/core]
-set linkBC [$ns duplex-link $Bgw $Core $throughput 0.1ms DropTail]
+set linkBC [$ns simplex-link $Bgw $Core $throughput 0.1ms dsRED/edge]
+set linkCB [$ns simplex-link $Core $Bgw $throughput 0.1ms dsRED/core]
 $ns queue-limit  $Core $Bgw  100
 
 
@@ -259,9 +263,9 @@ for {set i 1} {$i <= $NodeCount} {incr i} {
 
 ###############################  QUEUES  ###############################
 
-# set q1 [setQueue $ns $Bgw $Core]
-# set qBC [lindex $q1 0]
-# set qCB [lindex $q1 1]
+set q1 [setQueue $ns $Bgw $Core B A $NodeCount]
+set qBC [lindex $q1 0]
+set qCB [lindex $q1 1]
 
 set q2 [setQueue $ns $Agw $Core A B $NodeCount]
 set qAC [lindex $q2 0]

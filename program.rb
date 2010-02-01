@@ -4,11 +4,11 @@ q1 = [[10, 20, 0.1,10, 20, 0.1], [10, 20, 0.1, 10, 20, 0.1], [10, 20, 0.1, 10, 2
 q2 = [[10, 20, 0.9,10, 20, 0.9], [10, 20, 0.9, 10, 20, 0.9], [10, 20, 0.9, 10, 20, 0.9]]
 
 settings = { :node_count => 3,
-             :packet_size => 10000,
-             :flows_count => 1000,
-             :link_throughput => '5Mb',
-             :cir => 100, :pir => 100,
-             :average_source_delay => '0.003'
+             :packet_size => 1000,
+             :flows_count => 100,
+             :link_throughput => '4Mb',
+             :cir => 30000, :pir => 60000,
+             :average_source_delay => '0.01'
            }
 
 simulation1 = Simulation.new settings.merge({:queue_settings => q1})
