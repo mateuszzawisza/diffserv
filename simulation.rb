@@ -9,7 +9,8 @@ VARIABLES_MAP = {
   :flows_count => 'FLOWS_COUNT',
   :link_throughput => 'THROUGHPUT',
   :cir => 'CIR',
-  :pir => 'PIR'
+  :pir => 'PIR',
+  :average_source_delay => 'AVERAGE_SOURCE_DELAY'
 }
 
 class Simulation
