@@ -165,7 +165,7 @@ set LinkLogFile [open output/link_AC_log.tr w]
 set packetSize [readFromEnvOrDefault PACKET_SIZE 1000]; # packet size
 set NodeCount  [readFromEnvOrDefault NODE_COUNT  4   ]; # Number of source nodes
 set FlowsCount [readFromEnvOrDefault FLOWS_COUNT 10  ]; # Number of flows per source node 
-set throughput [readFromEnvOrDefault THROUGHPUT  6Mb ]; # router's thorughput
+set throughput [readFromEnvOrDefault THROUGHPUT  5Mb ]; # router's thorughput
 
 #$ns trace-all $traceFile    
 
@@ -178,6 +178,7 @@ set connectionsLeft [expr $FlowsCount * $NodeCount]
 set cir [readFromEnvOrDefault CIR  3000]; # end-users' cir value
 set pir [readFromEnvOrDefault PIR 10000]; # end-users' pir value
 
+set averageSourceTransferDelay [readFromEnvOrDefault AVERAGE_SOURCE_DELAY 0.1]; # average delay before a source starts the next transfer
 
 array set queueParams [initQueueParams]
  
@@ -255,7 +256,7 @@ $randomNumberGenerator seed 22
 
 # Random inter-arrival times of TCP transfer at each source i
 set randomVariable [new RandomVariable/Exponential]
-$randomVariable set avg_ 0.2
+$randomVariable set avg_ $averageSourceTransferDelay
 $randomVariable use-rng $randomNumberGenerator 
 
 logMessage "Random size of files to transmit"
