@@ -98,10 +98,15 @@ proc setQueue {ns s d a b nodeCount} {
 
   for {set i 1} {$i<=$nodeCount} { incr i } {
     for {set j 1} {$j<=$nodeCount} { incr j } {
+      if {[expr $i / 2] < $nodeCount} {
+        set codepoint 10
+      } else {
+        set codepoint 11
+      }
       puts "A($i) = [$A($i) id]    --->     B($j) = [$B($j) id]"
-      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM 10 $cir $pir
+      $queueSD addPolicyEntry [$A($i) id] [$B($j) id] TSW3CM $codepoint $cir $pir
       puts "A($i) = [$A($j) id]    <---     B($i) = [$B($j) id]"
-      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM 10 $cir $pir
+      $queueDS addPolicyEntry [$B($i) id] [$A($j) id] TSW3CM $codepoint $cir $pir
     }
   }
 

@@ -7,7 +7,7 @@ settings = { :node_count => 3,
              :packet_size => 10000,
              :flows_count => 1000,
              :link_throughput => '5Mb',
-             :cir => 100, :pir => 10000,
+             :cir => 100, :pir => 100,
              :average_source_delay => '0.003'
            }
 
@@ -18,5 +18,5 @@ simulation1.run and simulation2.run
 
 puts "\nFirst simulation:", simulation1.result.inspect, "\nSecond simulation:", simulation2.result.inspect
 
-#puts simulation1.output
-#puts simulation2.output
+puts simulation1.output
+puts simulation2.output
