@@ -114,6 +114,34 @@ proc setQueue {ns s d a b nodeCount} {
     }
   }
 
+  #  set importantClass [new CBQClass]
+  #  set normalClass [new CBQClass]
+  #
+  #
+  #  $importantClass setparams none true 0.5 1 0 1 0.1
+  #  $normalClass    setparams none true 0.5 1 9 1 0.1
+  #  # $cbqclass setparams <parent> <okborrow> <allot> <maxidle> <prio> <level>
+  #
+  #  # $cbqclass install-queue <q>
+  #
+  #  # okborrow_ is a boolean indicating the class is permitted to borrow bandwidth from its parent.
+  #
+  #  # allot_ is the maximum fraction of link bandwidth allocated to the class expressed as a real number between 0.0 and 1.0
+  #
+  #  # maxidle_ is the maximum amount of time a class may be required to have its packets queued before they are permitted to be forwarded
+  #
+  #  # priority_ is the class’ priority level with respect to other classes. This value may range from 0 to 10, and more than one class may exist at the same priority. Priority 0 is the highest priority.
+  #
+  #  # level_ is the level of this class in the link-sharing tree. Leaf nodes in the tree are considered to be at level 1; their parents are at level 2, etc.
+  #
+  #  # extradelay_ increase the delay experienced by a delayed class by the speciﬁed time
+  #
+  #  $importantClass install-queue $queueDS
+  #  $importantClass install-queue $queueSD
+  #  $normalClass install-queue $queueDS
+  #  $normalClass install-queue $queueSD
+
+
   $queueSD printPolicyTable
   $queueSD printPolicerTable
 
