@@ -37,12 +37,12 @@ class Simulation
       "#{env_variable_name}='#{value}'"
     end
     self.command = "#{variables.join(" ")} #{SIMULATION_COMMAND}"
-    puts "Created command:\n  #{self.command}"
+    #puts "Created command:\n  #{self.command}"
   end
 
   def run
     self.set_queue_settings
-    puts "Issuing:\n  #{self.command}"
+    #puts "Issuing:\n  #{self.command}"
     self.output = eval "%x[#{ self.command }]"
   end
   
@@ -55,7 +55,7 @@ class Simulation
     table.delete_at 0
     names = table.shift
     hashed_table = table.inject({}) {|sum, val| sum.merge({val.delete_at(0) => val})}
-    puts "headers: #{names.join(' | ')}"
+    #puts "headers: #{names.join(' | ')}"
     return hashed_table
   end
 
@@ -64,7 +64,7 @@ class Simulation
     queues = []
     self.queue_settings.each {|qp| queues << qp.join(" ")}
     queues = queues.join("\n")
-    puts "Queue settings:\n-----------\n#{queues}\n-----------"
+    #puts "Queue settings:\n-----------\n#{queues}\n-----------"
     queues_file = File.open("queue_params", "w") do |file|
       file.write queues 
     end
@@ -73,7 +73,7 @@ class Simulation
 end
 
 
-#puts "Running simulations..."
+##puts "Running simulations..."
 #simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10#, :link_throughput => '6Mb'
-#puts "da enda"
-puts "Run:\n   simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10, :link_throughput => '6Mb', :cir => 3000, :pir => 10000"
+##puts "da enda"
+#puts "Run:\n   simulation = Simulation.run! :node_count => 3, :packet_size => 100, :flows_count => 10, :link_throughput => '6Mb', :cir => 3000, :pir => 10000"
