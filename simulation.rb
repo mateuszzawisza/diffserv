@@ -47,16 +47,27 @@ class Simulation
   end
   
   def result
-    table_text = self.output.split(/^=+$/).last
-    table = table_text.split("\n").collect do |line|
-      line.split(/(\t|\ )+/).delete_if {|str| str.empty? or str.match(/^(\t|\ )+$/)}
+    tables = self.output.split(/^=+$/)
+    tables.shift
+    tables.pop
+    tables = tables.collect {|table| t = table.split("\n"); t.shift; t.shift; t.shift; t.pop; t.pop; t}
+    tables = tables.collect do |table|
+
+      table = table.collect do |row|
+        row.split(/(\t|\ )+/).delete_if {|str| str.empty? or str.match(/^(\t|\ )+$/)}
+      end
+      table.inject({}) {|sum, row| sum.merge({row.shift => row})}
     end
-    table.delete_at 2
-    table.delete_at 0
-    names = table.shift
-    hashed_table = table.inject({}) {|sum, val| sum.merge({val.delete_at(0) => val})}
-    #puts "headers: #{names.join(' | ')}"
-    return hashed_table
+    return tables.collect {|t| StatRecord.new(t)}
+  end
+  
+  def optimized_result
+    r= self.result
+    if r.count < 4
+      raise Exception.new 'too less results to count average...'
+    else
+      return r[3*r.count/4] - r[r.count/4]
+    end
   end
 
   # this is a function that saves params to a file and exmple of the table that needs to be set
@@ -67,6 +78,41 @@ class Simulation
     #puts "Queue settings:\n-----------\n#{queues}\n-----------"
     queues_file = File.open("queue_params", "w") do |file|
       file.write queues 
+    end
+  end
+
+  class StatRecord
+    QUEUE_NAMES = [:all, :red, :yellow, :green]
+    attr_accessor *QUEUE_NAMES
+    def initialize(options={})
+      self.all = options.delete('All') || [0,0,0,0]
+      self.red = options.delete('12') || [0,0,0,0]
+      self.yellow = options.delete('11') || [0,0,0,0]
+      self.green = options.delete('10') || [0,0,0,0]
+      QUEUE_NAMES.each do |queue|
+         self.send "#{queue.to_s}=", (self.send(queue.to_s).collect {|x| x.to_i})
+      end
+    end
+    
+    def -(s)
+      r = self.class.new
+      QUEUE_NAMES.each do |queue|
+         q1 = self.send queue
+         q2 = s.send queue
+         result = []
+         q1.each_with_index do |x, index|
+           result << x.to_i - q2[index].to_i
+         end
+         r.send "#{queue.to_s}=", result
+      end
+      return r
+    end
+    
+    def to_s
+      r = QUEUE_NAMES.collect do |queue|
+        "#{queue.to_s.capitalize[0..0]}, #{self.send(queue).join(', ')}"
+      end
+      return r.join ', '
     end
   end
 

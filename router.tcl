@@ -2,7 +2,7 @@ global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk
 # The following procedure is called whenever a connection ends
 Agent/TCP instproc done {} {
 global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk RandomFileSize 
-puts -nonewline "."
+# puts -nonewline "."
 #logMessage "connection ended!"
   # print in $TransferLogFile: node, session, start time,  end time, duration,      
   # trans-pkts, transm-bytes, retrans-bytes, throughput   
@@ -155,7 +155,7 @@ proc finish {} {
   logMessage "finished"
   global ns qAC
   $ns flush-trace
-  puts "\n\nFinished.\n\n"
+  # puts "\n\nFinished.\n\n"
   $qAC printStats
   exit 0
 }         
@@ -331,7 +331,11 @@ for {set j 1} {$j<=$NodeCount} { incr j } {
   set Cnts($j) 0
 }   
  
-puts "\n\nRunning!\n\n"
-
+# puts "\n\nRunning!\n\n"
+for {set j 1} {$j<=100} { incr j } {
+	 $ns at [expr $j/10] "$qAC printStats"
+	
+	 # $ns at 0.1 "puts 1"
+ }
 
 $ns run

@@ -2,3 +2,4 @@
 *.swo
 output
 queue_params
+.DS_Store

@@ -13,7 +13,7 @@ settings = { :node_count => 3,
              :average_source_delay => '0.1'
             }
             
-File.open("output.log", "w") do |f|
+File.open("output/program.log", "w") do |f|
   (0..10).each do |prob1|
     prob1 = prob1/10.to_f
     (0..10).each do |prob2|
@@ -25,10 +25,12 @@ File.open("output.log", "w") do |f|
         #simulation2 = Simulation.new settings.merge({:queue_settings => q2})
 
         simulation1.run #and simulation2.run
-        hash = simulation1.result
+        hash = simulation1.optimized_result
         #debugger
-        puts "\n#{prob1.to_s}, #{prob2.to_s}, #{prob3.to_s}", hash.inspect, 100*(hash["All"][1].to_f/hash["All"][0].to_f) #, "\nSecond simulation:", simulation2.result.inspect
-        f.write "\n#{prob1.to_s}, #{prob2.to_s}, #{prob3.to_s} " + hash.inspect + " " + (100*(hash["All"][1].to_f/hash["All"][0].to_f)).to_s
+        puts "\n#{prob1.to_s}, #{prob2.to_s}, #{prob3.to_s}", hash
+        #.inspect, 100*(hash["All"][1].to_f/hash["All"][0].to_f) #, "\nSecond simulation:", simulation2.result.inspect
+        f.write "\n#{prob1.to_s}, #{prob2.to_s}, #{prob3.to_s}, " + hash.to_s
+        #.inspect + " " + (100*(hash["All"][1].to_f/hash["All"][0].to_f)).to_s
       end
     end
   end
