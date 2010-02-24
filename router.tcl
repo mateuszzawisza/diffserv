@@ -21,9 +21,9 @@ global tcpsrc NodeCount FlowsCount ns randomVariable ftp TransferLogFile tcp_snk
   global connectionsLeft
   set connectionsLeft [expr $connectionsLeft - 1]
 
-  if {$connectionsLeft < 1} {
-    [finish]
-  }
+   if {$connectionsLeft < 1} {
+     [finish]
+   }
 }
 
 proc countFlows { ind sign } {
@@ -200,9 +200,11 @@ set TransferLogFile [open output/TransferLogFile.ns w];   # file containing tran
 set LinkLogFile [open output/link_AC_log.tr w]
 
 set packetSize [readFromEnvOrDefault PACKET_SIZE 1000]; # packet size
+set simulationDuration [readFromEnvOrDefault SIMULATION_DURATION 10]; # simulation duration
 set NodeCount  [readFromEnvOrDefault NODE_COUNT  4   ]; # Number of source nodes
 set FlowsCount [readFromEnvOrDefault FLOWS_COUNT 10  ]; # Number of flows per source node 
 set throughput [readFromEnvOrDefault THROUGHPUT  5Mb ]; # router's thorughput
+set averageFileSize [readFromEnvOrDefault AVERAGE_FILE_SIZE 1000 ]; # average file size
 
 #$ns trace-all $traceFile    
 
@@ -280,7 +282,7 @@ for {set i 1} {$i <= $NodeCount} { incr i } {
     set tcp_snk($i,$j) [new Agent/TCPSink]
     set k [expr $i*1000 +$j];
     $tcpsrc($i,$j) set fid_ $k
-    $tcpsrc($i,$j) set window_ 2000
+    $tcpsrc($i,$j) set window_ 20
     $tcpsrc($i,$j) set packetSize_ $packetSize
     $ns attach-agent $A($i) $tcpsrc($i,$j)
     $ns attach-agent $B($i) $tcp_snk($i,$j)
@@ -300,19 +302,18 @@ $randomVariable use-rng $randomNumberGenerator
 
 logMessage "Random size of files to transmit"
 set RandomFileSize [new RandomVariable/Pareto]
-$RandomFileSize set avg_ 10000 
+$RandomFileSize set avg_ $averageFileSize 
 $RandomFileSize set shape_ 1.25
 $RandomFileSize use-rng $randomNumberGenerator
 
-# dummy command
-#set t [$RandomFileSize value]
 
 # We now define the beginning times of transfers and the transfer sizes
 # Arrivals of sessions follow a Poisson process.
 
 logMessage "defining beginning times of transfers"
 for {set i 1} {$i<=$NodeCount} { incr i } {
-  set t [$ns now]
+  set t 0
+  #[$ns now]
 
   for {set j 1} {$j<=$FlowsCount} { incr j } {
 	  # set the beginning time of next transfer from source and attributes
@@ -332,10 +333,12 @@ for {set j 1} {$j<=$NodeCount} { incr j } {
 }   
  
 # puts "\n\nRunning!\n\n"
-for {set j 1} {$j<=100} { incr j } {
+for {set j 1} {$j<=10000} { incr j } {
 	 $ns at [expr $j/10] "$qAC printStats"
 	
 	 # $ns at 0.1 "puts 1"
  }
+
+#$ns at $simulationDuration "finish"
 
 $ns run

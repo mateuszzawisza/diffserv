@@ -10,7 +10,9 @@ VARIABLES_MAP = {
   :link_throughput => 'THROUGHPUT',
   :cir => 'CIR',
   :pir => 'PIR',
-  :average_source_delay => 'AVERAGE_SOURCE_DELAY'
+  :average_source_delay => 'AVERAGE_SOURCE_DELAY',
+  :simulation_duration => 'SIMULATION_DURATION',
+  :average_file_size => 'AVERAGE_FILE_SIZE'
 }
 
 class Simulation
@@ -113,6 +115,26 @@ class Simulation
         "#{queue.to_s.capitalize[0..0]}, #{self.send(queue).join(', ')}"
       end
       return r.join ', '
+    end
+
+    def inspect(hardcore=false)
+      count_sum = self.all.first
+      green_count = self.green.first 
+      yellow_count = self.yellow.first
+      red_count = self.red.first
+      green_percentage  = count_sum > 0 ? (100.to_f * green_count / count_sum).round  : 0
+      yellow_percentage = count_sum > 0 ? (100.to_f * yellow_count / count_sum).round : 0
+      red_percentage    = count_sum > 0 ? (100.to_f * red_count / count_sum).round    : 0
+      green_ldrops_percentage  = green_count > 0  ? self.green[2] / green_count    : 0
+      green_edrops_percentage  = green_count > 0  ? self.green[3] / green_count    : 0
+      yellow_ldrops_percentage = yellow_count > 0 ? self.yellow[2] / yellow_count  : 0
+      yellow_edrops_percentage = yellow_count > 0 ? self.yellow[3] / yellow_count  : 0
+      red_ldrops_percentage    = red_count > 0    ? self.red[2] / red_count        : 0
+      red_edrops_percentage    = red_count > 0    ? self.red[3] / red_count        : 0
+      puts self.to_s if hardcore
+      return "SUM: #{count_sum}, G: #{green_percentage}#{green_count == 0 ? '' : '%'}, Y: #{yellow_percentage}#{yellow_count == 0 ? '' : '%'}, R: #{red_percentage}#{red_count == 0 ? '' : '%'}" \
+      +  "\nLdrops     G: #{green_ldrops_percentage}%, Y: #{yellow_ldrops_percentage}%, R: #{red_ldrops_percentage}%" \
+      +  "\nEdrops     G: #{green_edrops_percentage}%, Y: #{yellow_edrops_percentage}%, R: #{red_edrops_percentage}%"
     end
   end
 
