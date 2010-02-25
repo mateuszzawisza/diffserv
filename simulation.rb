@@ -11,12 +11,14 @@ VARIABLES_MAP = {
   :cir => 'CIR',
   :pir => 'PIR',
   :average_source_delay => 'AVERAGE_SOURCE_DELAY',
-  :simulation_duration => 'SIMULATION_DURATION',
+#  :simulation_duration => 'SIMULATION_DURATION',
   :average_file_size => 'AVERAGE_FILE_SIZE'
 }
 
 class Simulation
   attr_accessor :command, :output, :queue_settings
+
+  attr_accessor *VARIABLES_MAP.keys
 
   def self.run!(options={})
     sim = self.new(options)
@@ -36,10 +38,19 @@ class Simulation
     variables = options.collect do |variable_name, value|
       env_variable_name = VARIABLES_MAP[variable_name]
       raise Exception.new("Variable #{variable_name} is not defined!") unless env_variable_name
+      self.send "#{variable_name}=", value
       "#{env_variable_name}='#{value}'"
     end
     self.command = "#{variables.join(" ")} #{SIMULATION_COMMAND}"
     #puts "Created command:\n  #{self.command}"
+  end
+
+  def theoretical_user_load
+    8 * self.average_file_size.to_i / self.average_source_delay.to_f
+  end
+
+  def theoretical_link_load
+    8 * self.node_count * self.average_file_size.to_i / self.average_source_delay.to_f
   end
 
   def run
