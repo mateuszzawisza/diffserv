@@ -97,20 +97,21 @@ Minimalna wartość ldropów w kolejce zielonej wystąpiła dla p3=0,6 i wynosi�
 
 
 
-eksperyment 2 - Kolejkowanie pakietów
+\section{eksperyment 2 - Kolejkowanie pakietów}
 
-parametry symulacji:
-
-rozmiar pakietu: 100B
-średni rozmiar pliku: 200kB
-ilość przepływów: 100
-przepustowość łącza: 6kb
-średni odstęp pomiędzy początkami transmisji: 0.3s
-CIR oraz PIR były zmiennymi
-analiza:
-
+\subsection{parametry symulacji:}\\
+\\
+rozmiar pakietu: 100B\\
+średni rozmiar pliku: 200kB\\
+ilość przepływów: 100\\
+przepustowość łącza: 6kb\\
+średni odstęp pomiędzy początkami transmisji: 0.3s\\
+CIR oraz PIR były zmiennymi\\
+\subsection{analiza:}\\
+\\
 W celu zobrazowania zasady działania kolejek diffserva przeprowadziliśmy symulacje przy zmieniających się parametrach CIR i PIR. PIR był zawsze dwa razy większy od CIR.
-Na wykresie poniżej możemy zaobserwować w jaki sposób pakiety przydzielane są do poszczególnych kolejek.
+Na wykresie poniżej możemy zaobserwować w jaki sposób pakiety przydzielane są do poszczególnych kolejek.\\
+\\
 
 
 
@@ -118,27 +119,29 @@ Na wykresie poniżej możemy zaobserwować w jaki sposób pakiety przydzielane s
 
 
 
-Gdy CIR jest niski wszystkie pakiety trafiają do kolejki czerwonej. W miare zwiększania parametrów CIR oraz PIR pakiety przenosiły się do kolejek żółtej i zielonej. Dla CIR 5000bps wszystkie pakiety znalazły się w kolejce zielonej.
+Gdy CIR jest niski wszystkie pakiety trafiają do kolejki czerwonej. W miare zwiększania parametrów CIR oraz PIR pakiety przenosiły się do kolejek żółtej i zielonej. Dla CIR 5000bps wszystkie pakiety znalazły się w kolejce zielonej.\\
+\\
 
-Teoretyczna wartość przepływu to średni rozmiar pliku/średni odstęp między początkami transmisji
-L = 200kB/0.3s = 666,(6)kB/s = 5333,(3)kb/s
+Teoretyczna wartość przepływu to średni rozmiar pliku/średni odstęp między początkami transmisji\\
+L = 200kB/0.3s = 666,(6)kB/s = 5333,(3)kb/s\\
+\\
 
 Jak widać jest to wartość graniczna CIR dla której kolejki żółta i czerwona są już puste, ponieważ przepustowość łącza jest wysterczająca i nie ma wtedy potrzeby odrzucania żadnych pakietów.
 
-eksperyment 3 - Graniczne wartości obciążenia
+\section{eksperyment 3 - Graniczne wartości obciążenia}
 
 
-parametry symulacji:
+\subsection{parametry symulacji:}
 
  
-ilość węzłów : 3
-wielkość pakietu: 100 B
-ilość przepływów: 100
-przepustowość łącza: 1Mb
-średnia wielkość pliku: 20kB
-średnie opóźnienie pomiędzy wysyłanymi pakietami: 0.3 s
+ilość węzłów : 3\\
+wielkość pakietu: 100 B\\
+ilość przepływów: 100\\
+przepustowość łącza: 1Mb\\
+średnia wielkość pliku: 20kB\\
+średnie opóźnienie pomiędzy wysyłanymi pakietami: 0.3 s\\
 
-analiza:
+\subsection{analiza:}
 
 
 Następnie przeprowadziliśmy kilka symulacji mających na celu pokazanie wpływu ustawiania parametrów PIR oraz CIR na zrzucanie pakietów podczas gdy sieć jest przeciążona.
