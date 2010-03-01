@@ -1,5 +1,5 @@
 %        File: dupa.tex
-%     Created: pon mar 01 04:00  2010 C
+%     Created: wt  lut 16 04:00  2010 C
 % Last Change: pon mar 01 04:00  2010 C
 %
 \documentclass[a4paper]{article}
@@ -8,21 +8,9 @@
 \usepackage[T1]{fontenc}
 \begin{document}
 
-
 \section{Wpływ zmiany parametrów definiowania klas ruchowych w DiffServ na transmisję w sieci}
 
-
-
-
-
-
 Projekt z przedmiotu Gwarantowanie Jakości Obsługi w Internecie
-
-
-
-
-
-
 
 Jacek Szarski
 Mateusz Zawisza
@@ -33,11 +21,12 @@ Naszym zadaniem było znalezienie związku pomiędzy konfiguracją mechanizmu Di
 
 \section{Topologia sieci}
 
-[obrazek z topologią]
+%obrazek z topologią]
 
-
+\paragraph{}
 W zestawionej przez nas sieci znajdowały się trzy węzły stanowiące źródła ruchu (A1, A2 ,A3), oraz trzy węzły będące odbiorcami ruchu (B1, B2, B3). Transmisja odbywała się od każdego nadawcy do każdego odbiorcy. Symulacja została ustawiona tak aby wystąpiły przeciążenia sieci na odcinku Agw - Bgw, co wiąże się z utratą przesyłanych pakietów.
 
+\paragraph{}
 Zastosowaliśmy politykę DiffServ Time Sliding Window Three Color Marker (TSW3CM).
 Polityka ta przyjmuje dwa parametry: CIR oraz PIR. Na ich podstawie oznacza pakiety kolorami zielony, żółty oraz czerwony. Pakiety które mieszczą się pod progiem CIR znaczone są na zielono, te które mieszczą się pomiędzy CIR oraz PIR znaczone są na żółto oraz te które są ponad progiem PIR znaczone są na czerwono. U nas przekładają się ona na wirtualne kanały, odpowiednio 0,1 oraz 2 co też wiąże się z odpowiednimi priorytetami. Najmniejszy priorytet mają pakiety w kanale wirtualnym 2 , a największy w kanale 0.
 
@@ -46,6 +35,7 @@ Polityka ta przyjmuje dwa parametry: CIR oraz PIR. Na ich podstawie oznacza paki
 
 
 
+\paragraph{}
 Symulację napisaliśmy w języku TCl, dla symulatora NS (plik router.tcl), a następnie, aby zautomatyzować proces gromadzenia danych, stworzyliśmy bibliotekę napisaną w języku Ruby która uruchamia go z zadanymi parametrami (simulation.rb). Część parametrów przekazywane jest przez zmienne środowiskowe środowiska BASH, część zaś przez plik tekstowy queue\_params. Cały program znajduje się w pliku program.rb.
 
 
@@ -99,16 +89,15 @@ Minimalna wartość ldropów w kolejce zielonej wystąpiła dla p3=0,6 i wynosi�
 
 \section{eksperyment 2 - Kolejkowanie pakietów}
 
-\subsection{parametry symulacji:}\\
-\\
+\subsection{parametry symulacji:}
 rozmiar pakietu: 100B\\
 średni rozmiar pliku: 200kB\\
 ilość przepływów: 100\\
 przepustowość łącza: 6kb\\
 średni odstęp pomiędzy początkami transmisji: 0.3s\\
 CIR oraz PIR były zmiennymi\\
-\subsection{analiza:}\\
-\\
+\subsection{analiza:}
+
 W celu zobrazowania zasady działania kolejek diffserva przeprowadziliśmy symulacje przy zmieniających się parametrach CIR i PIR. PIR był zawsze dwa razy większy od CIR.
 Na wykresie poniżej możemy zaobserwować w jaki sposób pakiety przydzielane są do poszczególnych kolejek.\\
 \\
