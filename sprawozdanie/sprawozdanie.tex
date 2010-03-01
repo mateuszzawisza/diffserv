@@ -3,6 +3,9 @@
 % Last Change: pon mar 01 04:00  2010 C
 %
 \documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
 \begin{document}
 
 
@@ -28,7 +31,7 @@ Mateusz Zawisza
 Naszym zadaniem było znalezienie związku pomiędzy konfiguracją mechanizmu DiffServ a uzyskaną jakością obsługi. W tym celu przygotowaliśmy symulację niedużej sieci IP z implementacją owego systemu, a następnie analizowaliśmy wyniki uzyskan dla różnych zadanych ustawień.
 
 
-Topologia sieci
+\section{Topologia sieci}
 
 [obrazek z topologią]
 
@@ -39,22 +42,24 @@ Zastosowaliśmy politykę DiffServ Time Sliding Window Three Color Marker (TSW3C
 Polityka ta przyjmuje dwa parametry: CIR oraz PIR. Na ich podstawie oznacza pakiety kolorami zielony, żółty oraz czerwony. Pakiety które mieszczą się pod progiem CIR znaczone są na zielono, te które mieszczą się pomiędzy CIR oraz PIR znaczone są na żółto oraz te które są ponad progiem PIR znaczone są na czerwono. U nas przekładają się ona na wirtualne kanały, odpowiednio 0,1 oraz 2 co też wiąże się z odpowiednimi priorytetami. Najmniejszy priorytet mają pakiety w kanale wirtualnym 2 , a największy w kanale 0.
 
 
-Szczegóły techniczne
-
-Symulację napisaliśmy w języku TCl, dla symulatora NS (plik router.tcl), a następnie, aby zautomatyzować proces gromadzenia danych, stworzyliśmy bibliotekę napisaną w języku Ruby która uruchamia go z zadanymi parametrami (simulation.rb). Część parametrów przekazywane jest przez zmienne środowiskowe środowiska BASH, część zaś przez plik tekstowy queue_params. Cały program znajduje się w pliku program.rb.
+\section{Szczegóły techniczne}
 
 
-Czas rozbiegu
+
+Symulację napisaliśmy w języku TCl, dla symulatora NS (plik router.tcl), a następnie, aby zautomatyzować proces gromadzenia danych, stworzyliśmy bibliotekę napisaną w języku Ruby która uruchamia go z zadanymi parametrami (simulation.rb). Część parametrów przekazywane jest przez zmienne środowiskowe środowiska BASH, część zaś przez plik tekstowy queue\_params. Cały program znajduje się w pliku program.rb.
+
+
+\section{Czas rozbiegu}
 Aby ustalić czas rozbiegu symulacji badaliśmy ilość zrzucanych ramek w czasie. Zayliśmy że w większości przypadków po ok 1/4 czasu trwania danej symulacji wyniki zaczynają się stabilizować. Po około 3/4 czasu trwania znów pojawia się zmiana w tendencji. Postanowiliśmy zatem ograniczyć czas pobierania wyników do zakresu od 1/4 do 3/4 czasu trwania.
 
 Symulator co 0.1 sekundy zwraca tabelę ze statystykami łącza. Wszystkie te tabele parsujemy, wybieramy wyniki w okolicach granic czasowych i odejmujemy je od siebie. W ten sposób faza rozbiegu oraz zakańczania nie mają wpływu na naszą analizę.
 
 
-eksperyment 1 - Prawdopodobieństwa zrzutu
+\section{eksperyment 1 - Prawdopodobieństwa zrzutu}
 
 
 
-parametry symulacji:
+\subsection{parametry symulacji:}
 
 Rozmiar pakietów (packet size) - 1000 KB
 Ilość przepływów (flows count) - 100
@@ -63,7 +68,7 @@ CIR (commited information rate) pasmo zapewnione - 30 kb/s
 PIR (peak information rate) pasmo szczytowe - 60 kb/s
 Średnie opóźnienie pomiędzy wysyłanymi pakietami - 0.01 s
 
-analiza:
+\subsection{analiza:}
 
 W poszczegulnych symulacjach zmienialiśmy wartości prawdopodobieństw zrzutu pakietów odpowiednio dla punktów kodowych 10, 11, 12, odpowiadającym kolorom zielonemu, żółtemu i czerwonemu.
 Przeciążenie łącza pozwoliło nam na zbadanie ilości pakietów zrzuconych przez DiffServ (edrops) oraz ilość pakietów zrzuconych z powodu przeciążenia łącza (ldrops) dla różnych prawdopodobieństw zrzutu w odpowiednich kanałach.
@@ -84,7 +89,13 @@ Zmiany pozostałych prawdopodobieństw nie miały wpływu na wyniki, przedstawia
 
 Procent edropów który przyjeliśmy za wyznacznik jakości łącza przyjmuje najwyższe wartości dla prawdopodobieństwa p3 z zakresu 0,3 do 0,9. Dla tego przedziału procent pakietów które dotarły do swojego przeznaczenia największą wartość osiąga dla p3=0,4, zatem tą wartość moglibyśmy uznać za najbardziej odpowiednią dla naszej topologii. 
 
-Minimalna wartość ldropów w kolejce zielonej wystąpiła dla p3=0,6 i wynosiła 2,25%. Przy tak małych wartościach ciężko jednak uznać tą wartość za reprezentatywną.
+Minimalna wartość ldropów w kolejce zielonej wystąpiła dla p3=0,6 i wynosiła 2,25\%. Przy tak małych wartościach ciężko jednak uznać tą wartość za reprezentatywną.
+
+
+
+----------------------------------
+
+
 
 eksperyment 2 - Kolejkowanie pakietów
 
