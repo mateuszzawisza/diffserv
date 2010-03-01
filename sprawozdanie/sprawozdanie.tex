@@ -7,6 +7,12 @@
 \usepackage[utf8]{inputenc}
 \usepackage[polish]{babel}
 \usepackage[T1]{fontenc}
+%\fontencoding{T1}
+%\fontfamily{arial}
+%\fontseries{m}
+%\fontshape{it}
+%\fontsize{12}{15}
+%\selectfont
 
 \title{Wpływ zmiany parametrów definiowania klas ruchowych w DiffServ na transmisję w sieci}
 \author{Jacek Szarski, Mateusz Zawisza}
@@ -20,7 +26,7 @@
 
 \pagebreak
 
-Naszym zadaniem było znalezienie związku pomiędzy konfiguracją mechanizmu DiffServ a uzyskaną jakością obsługi. W tym celu przygotowaliśmy symulację niedużej sieci IP z implementacją owego systemu, a następnie analizowaliśmy wyniki uzyskan dla różnych zadanych ustawień.
+Naszym zadaniem było znalezienie związku pomiędzy konfiguracją mechanizmu DiffServ a uzyskaną jakością obsługi. W tym celu przygotowaliśmy symulację niedużej sieci IP z implementacją owego systemu, a następnie analizowaliśmy wyniki uzyskane dla różnych zadanych ustawień.
 
 
 \section{Topologia sieci}
@@ -29,7 +35,7 @@ Naszym zadaniem było znalezienie związku pomiędzy konfiguracją mechanizmu Di
 \includegraphics[width=120mm]{images/topologia.jpeg}
 
 \paragraph{}
-W zestawionej przez nas sieci znajdowały się trzy węzły stanowiące źródła ruchu (A1, A2 ,A3), oraz trzy węzły będące odbiorcami ruchu (B1, B2, B3). Transmisja odbywała się od każdego nadawcy do każdego odbiorcy. Symulacja została ustawiona tak aby wystąpiły przeciążenia sieci na odcinku Agw - Bgw, co wiąże się z utratą przesyłanych pakietów.
+W zestawionej przez nas sieci znajdowały się trzy węzły stanowiące źródła ruchu (A1, A2 ,A3), oraz trzy węzły będące odbiorcami ruchu (B1, B2, B3). Transmisja odbywała się od każdego nadawcy Ai do każdego odbiorcy Bi. Symulacja została ustawiona tak aby wystąpiły przeciążenia sieci na odcinku Agw - Bgw, co wiąże się z utratą przesyłanych pakietów.
 
 \paragraph{}
 Zastosowaliśmy politykę DiffServ Time Sliding Window Three Color Marker (TSW3CM).
@@ -46,7 +52,7 @@ Symulację napisaliśmy w języku TCl, dla symulatora NS (plik router.tcl), a na
 \section{Czas rozbiegu}
 
 \paragraph{}
-Aby ustalić czas rozbiegu symulacji badaliśmy ilość zrzucanych ramek w czasie. Zayliśmy że w większości przypadków po ok 1/4 czasu trwania danej symulacji wyniki zaczynają się stabilizować. Po około 3/4 czasu trwania znów pojawia się zmiana w tendencji. Postanowiliśmy zatem ograniczyć czas pobierania wyników do zakresu od 1/4 do 3/4 czasu trwania.
+Aby ustalić czas rozbiegu symulacji badaliśmy ilość zrzucanych ramek w czasie. Zauważyliśmy że w większości przypadków po ok 1/4 czasu trwania danej symulacji wyniki zaczynają się stabilizować. Po około 3/4 czasu trwania znów pojawia się zmiana w tendencji. Postanowiliśmy zatem ograniczyć czas pobierania wyników do zakresu od 1/4 do 3/4 czasu trwania.
 
 \paragraph{}
 Symulator co 0.1 sekundy zwraca tabelę ze statystykami łącza. Wszystkie te tabele parsujemy, wybieramy wyniki w okolicach granic czasowych i odejmujemy je od siebie. W ten sposób faza rozbiegu oraz zakańczania nie mają wpływu na naszą analizę.
@@ -58,12 +64,12 @@ Symulator co 0.1 sekundy zwraca tabelę ze statystykami łącza. Wszystkie te ta
 
 \subsection{parametry symulacji:}
 
-Rozmiar pakietów (packet size) - 1000 KB
-Ilość przepływów (flows count) - 100
-Przepustowość wszystkich łączy (throughput) - 4Mb 
-CIR (commited information rate) pasmo zapewnione - 30 kb/s
-PIR (peak information rate) pasmo szczytowe - 60 kb/s
-Średnie opóźnienie pomiędzy wysyłanymi pakietami - 0.01 s
+Rozmiar pakietów (packet size) - 1000 KB\\
+Ilość przepływów (flows count) - 100\\
+Przepustowość wszystkich łączy (throughput) - 4Mb\\
+CIR (commited information rate) pasmo zapewnione - 30 kb/s\\
+PIR (peak information rate) pasmo szczytowe - 60 kb/s\\
+Średnie opóźnienie pomiędzy wysyłanymi pakietami - 0.01s\\
 
 \subsection{analiza:}
 
