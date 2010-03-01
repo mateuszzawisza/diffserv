@@ -3,6 +3,7 @@
 % Last Change: pon mar 01 04:00  2010 C
 %
 \documentclass[a4paper]{article}
+\usepackage[pdftex]{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage[polish]{babel}
 \usepackage[T1]{fontenc}
@@ -21,7 +22,8 @@ Naszym zadaniem było znalezienie związku pomiędzy konfiguracją mechanizmu Di
 
 \section{Topologia sieci}
 
-%obrazek z topologią]
+%obrazek z topologią
+\includegraphics[width=120mm]{images/topologia.jpeg}
 
 \paragraph{}
 W zestawionej przez nas sieci znajdowały się trzy węzły stanowiące źródła ruchu (A1, A2 ,A3), oraz trzy węzły będące odbiorcami ruchu (B1, B2, B3). Transmisja odbywała się od każdego nadawcy do każdego odbiorcy. Symulacja została ustawiona tak aby wystąpiły przeciążenia sieci na odcinku Agw - Bgw, co wiąże się z utratą przesyłanych pakietów.
@@ -79,20 +81,18 @@ Badając ilość paketów które dotarły oraz stosunek ilości edropów do ldro
 Zmiany pozostałych prawdopodobieństw nie miały wpływu na wyniki, przedstawiamy więc tylko ich wybraną część, która ilustruje związek.
 
 
-%[wykres z prawdopodobieństwami]
+%wykres z prawdopodobieństwami
+\includegraphics[width=120mm]{images/punkt_1_wykres.png}
 
 
 % TABELKA
+\includegraphics[width=120mm]{images/punkt_1_tabela.png}
 
 \paragraph{}
 Procent edropów który przyjeliśmy za wyznacznik jakości łącza przyjmuje najwyższe wartości dla prawdopodobieństwa p3 z zakresu 0,3 do 0,9. Dla tego przedziału procent pakietów które dotarły do swojego przeznaczenia największą wartość osiąga dla p3=0,4, zatem tą wartość moglibyśmy uznać za najbardziej odpowiednią dla naszej topologii. 
 
 \paragraph{}
 Minimalna wartość ldropów w kolejce zielonej wystąpiła dla p3=0,6 i wynosiła 2,25\%. Przy tak małych wartościach ciężko jednak uznać tą wartość za reprezentatywną.
-
-
-
-----------------------------------
 
 
 
@@ -116,6 +116,7 @@ Na wykresie poniżej możemy zaobserwować w jaki sposób pakiety przydzielane s
 
 
 %wykres z kolejkami
+\includegraphics[width=120mm]{images/punkt_2_wykres.png}
 
 
 \paragraph{}
@@ -154,6 +155,7 @@ W miarę zmniejszania CIR możemy zaobserwować przemieszczanie się pakietów d
 
 
 % tabelka z kolejkami
+\includegraphics[width=120mm]{images/punkt_3_tabela.png}
 
 \paragraph{}
 Zadaniem administratora sieci jest takie wypośrodkowanie ustawień aby w razie przeciążenia wszystkie kolejki pracowały, zachowując odpowiednie proporcje ilości pakietów.
