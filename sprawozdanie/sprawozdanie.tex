@@ -74,7 +74,7 @@ PIR (peak information rate) pasmo szczytowe - 60 kb/s\\
 \subsection{analiza:}
 
 \paragraph{}
-W poszczegulnych symulacjach zmienialiśmy wartości prawdopodobieństw zrzutu pakietów odpowiednio dla punktów kodowych 10, 11, 12, odpowiadającym kolorom zielonemu, żółtemu i czerwonemu.
+W poszczególnych symulacjach zmienialiśmy wartości prawdopodobieństw zrzutu pakietów odpowiednio dla punktów kodowych 10, 11, 12, odpowiadającym kolorom zielonemu, żółtemu i czerwonemu.
 Przeciążenie łącza pozwoliło nam na zbadanie ilości pakietów zrzuconych przez DiffServ (edrops) oraz ilość pakietów zrzuconych z powodu przeciążenia łącza (ldrops) dla różnych prawdopodobieństw zrzutu w odpowiednich kanałach.
 
 \paragraph{}
@@ -133,8 +133,8 @@ Gdy CIR jest niski wszystkie pakiety trafiają do kolejki czerwonej. W miare zwi
 \\
 
 \paragraph{}
-Teoretyczna wartość przepływu to średni rozmiar pliku/średni odstęp między początkami transmisji\\
-L = 200kB/0.3s = 666,(6)kB/s = 5333,(3)kb/s\\
+Teoretyczna wartość przepływu to średni rozmiar pliku podzielony przez średni odstęp między początkami transmisji\\
+\[L = \frac{200kB} {0.3s} = 666,(6) \frac{kB} {s} = 5333,(3)kbps \]
 \\
 
 \paragraph{}
@@ -161,10 +161,8 @@ Następnie przeprowadziliśmy kilka symulacji mających na celu pokazanie wpływ
 Gdy CIR został ustawiony na równi z przepustowością wąskiego gardła naszej sieci (1 Mbps) wszystkie pakiety znalazły się w kolejce zielonej i w niej także następowały dropy. Przy takim ustawieniu jakość obsługi nie była gwaratowana.
 W miarę zmniejszania CIR możemy zaobserwować przemieszczanie się pakietów do kolejek czerwonej i żółtej z których pakiety są zrzucane w pierwszej kolejności.
 
-
-
 % tabelka z kolejkami
-\includegraphics[width=120mm]{images/punkt_3_tabela.png}
+\includegraphics[width=150mm]{images/punkt_3_tabela.png}
 
 \paragraph{}
 Zadaniem administratora sieci jest takie wypośrodkowanie ustawień aby w razie przeciążenia wszystkie kolejki pracowały, zachowując odpowiednie proporcje ilości pakietów.
@@ -175,7 +173,7 @@ Zadaniem administratora sieci jest takie wypośrodkowanie ustawień aby w razie 
 DiffServ jest jednym z wielu rozwiązań pozwalającym administratorom na dostosowanie sieci do wymogów biznesowych. Pozwala zapewnić odpowiednie parametry jakości obsługi dzięki szczegółowej konfiguracji zachowania węzłów jak i połączeń. Jego obszar aplikacji to większe sieci składające się z dużej ilości urządzeń w których skład wchodzą routery brzegowe i szkieletowe.
 
 \paragraph{}
-Aby skonfigurować działąjący system QoS musieliśmy zadać sobie dużo trudu, nie polecamy więć systemu DiffServe dla początkujących administratorów.
+Aby skonfigurować działąjący system QoS musieliśmy zadać sobie dużo trudu, nie polecamy więć systemu DiffServ dla początkujących administratorów.
 
 
 
